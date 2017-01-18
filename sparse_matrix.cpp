@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 
+
 class sp_matrix
 {
 private:
@@ -20,6 +21,10 @@ public:
 	void read_from_CSR(std::string filename);
 	
 	void get_CSR(std::vector<int> &row, std::vector<int> &col, std::vector<double> &val);
+	
+	// variable "size" is a size of a vector
+	template <typename T>
+	void read_vector(std::vector<T> &vec, int size, std::ifstream &ifile);
     
 };
 
@@ -35,29 +40,10 @@ void sp_matrix::read_from_CSR(std::string filename)
 	else
 	{
 		ifile	>> _N >> _nnz;
-		{
-			int p = 0;
-			for (int i = 0; i <= _N; ++i)
-			{
-				ifile >> p;
-				_row.push_back(p);
-			}
-			
-			for (int i = 0; i < _nnz; ++i)
-			{
-				ifile >> p;
-				_col.push_back(p);
-			}
-		}
 		
-		{	 	
-			double p = 0;
-			for (int i = 0; i < _nnz; ++i)
-			{
-				ifile >> p;
-				_val.push_back(p);
-			}
-		}
+		read_vector(_row, (_N+1), ifile);
+		read_vector(_col, _nnz, ifile);
+		read_vector(_val, _nnz, ifile);
 	}
 }
 
@@ -68,7 +54,14 @@ void sp_matrix::get_CSR(std::vector<int> &row, std::vector<int> &col, std::vecto
 	val = _val;
 }
 
-
+template <typename T>
+void sp_matrix::read_vector(std::vector<T> &vec, int size, std::ifstream &ifile)
+{
+	vec.resize(size);
+	
+	for (auto i = 0; i < size; ++i)
+		ifile >> vec[i];
+}
 
 
 int main()
